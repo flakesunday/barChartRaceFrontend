@@ -40,7 +40,7 @@ export default function Home() {
       } else {
         setYear(1950); // รีเซ็ตค่ากลับไปที่ 1950
       }
-    }, 300);
+    }, 600);
     return () => clearInterval(interValId);
   }, [year]);
 
