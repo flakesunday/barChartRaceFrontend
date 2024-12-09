@@ -1,95 +1,101 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  LabelList,
+  Legend,
+} from "recharts";
 
 export default function Home() {
-  return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>src/app/page.js</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [isClient, setIsClient] = useState(false);
+  const [data, setData] = useState([]);
+  const [year, setYear] = useState(1950);
+  const [currentYearIndex, setCurrentYearIndex] = useState(0);
+  useEffect(() => {
+    const fetchPopulationData = async () => {
+      try {
+        const response = await axios
+          .get(`http://localhost:8000/populations/${year}`)
+          .then((response) => {
+            console.log(response?.data?.data?.countries);
+            const formattedResponse = response?.data?.data?.countries;
+            // return response?.data?.data;
+            setData(formattedResponse);
+          })
+          .catch((error) => console.error("error =>", error));
+      } catch (error) {
+        console.error("Error fetching population data:", error);
+      }
+    };
+    const interValId = setInterval(() => {
+      fetchPopulationData();
+      if (year < 2020) {
+        setYear((prevParam) => prevParam + 1);
+      } else {
+        setYear(1950); // รีเซ็ตค่ากลับไปที่ 1950
+      }
+    }, 300);
+    return () => clearInterval(interValId);
+  }, [year]);
 
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  const CustomLabel = ({ x, y, value }) => (
+    <text
+      x={x + 10} // Offset to the right of the bar
+      y={y + 5} // Adjust vertical alignment
+      fill="black"
+      fontSize="12"
+      textAnchor="start"
+      style={{
+        transition: "all 0.3s ease", // Smooth animation
+      }}
+    >
+      {value.toLocaleString()} {/* Add commas */}
+    </text>
+  );
+
+  return isClient ? (
+    <div style={{ padding: "20px", textAlign: "center" }}>
+      <h1>Population Growth per Country</h1>
+      <h2>Year: {year}</h2>
+      <ResponsiveContainer width="100%" height={400}>
+        <BarChart data={data} layout="vertical">
+          <XAxis type="number" />
+          <YAxis type="category" dataKey="name" width={150} />
+          <Tooltip />
+          <Legend verticalAlign="top" height={36} payload={data} />
+          <Bar dataKey="value" fill="#8884d8" isAnimationActive={false}>
+            <LabelList
+              dataKey="value"
+              /*content={CustomLabel}*/ content={(props) => {
+                const { x, y, width, value } = props;
+                // Place the label to the right of the bar
+                return (
+                  <text
+                    x={x + width + 5} // Adjust the position of the label
+                    y={y + 10} // Vertically center the label with the bar
+                    fill="#8884d8" // Label color
+                    fontSize={12}
+                  >
+                    {value}
+                  </text>
+                );
+              }}
             />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
     </div>
+  ) : (
+    <div>Loading...</div>
   );
 }
