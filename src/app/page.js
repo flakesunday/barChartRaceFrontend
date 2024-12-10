@@ -98,9 +98,10 @@ const BarChartRace = () => {
 
     let yearIndex = 0;
     const fetchPopulationData = async () => {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
       try {
         const response = await axios
-          .get(`${process.env.NEXT_PUBLIC_API_URL}${year}`)
+          .get(`${apiUrl}${year}`)
           .then((response) => {
             console.log(response?.data?.data);
             const formattedResponse = response?.data?.data;
