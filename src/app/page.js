@@ -447,13 +447,16 @@ const BarChartRace = () => {
       svg
         .select(".x-axis")
         .attr("transform", `translate(0, ${height - margin.bottom})`)
-        .call(d3.axisBottom(x).ticks(5).tickFormat(d3.format(".2s")));
-
+        .call(d3.axisBottom(x).ticks(5).tickFormat(d3.format(".2s")))
+        .selectAll("text") // เลือกทุกข้อความในแกน Y
+        .style("font-size", "16px");
       // สร้างหรืออัปเดตแกน y (ชื่อประเทศ)
       svg
         .select(".y-axis")
         .attr("transform", `translate(${margin.left}, 0)`)
-        .call(d3.axisLeft(y));
+        .call(d3.axisLeft(y))
+        .selectAll("text") // เลือกทุกข้อความในแกน Y
+        .style("font-size", "18px"); //
 
       // สร้างหรืออัปเดต bars
       const bars = svg.selectAll(".bar").data(dataForYear, (d) => d.name);
