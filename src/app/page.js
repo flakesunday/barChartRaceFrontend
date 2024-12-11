@@ -9,10 +9,49 @@ const BarChartRace = () => {
   const [sumPopulation, setSumPopulation] = useState(0);
 
   const svgRef = useRef();
+  const eachCountryFlag = (country) => {
+    switch (country) {
+      case "China":
+        return "./images/chinaFlag.png";
+      // code block
 
+      case "India":
+        return "./images/indiaFlag.png";
+      // code block
+      case "United States":
+        return "./images/unitedStateFlag.png";
+      // code block
+      case "Indonesia":
+        return "./images/indonesiaFlag.png";
+      // code block
+      case "Brazil":
+        return "./images/brazilFlag.png";
+      // code block
+      case "Russia":
+        return "./images/russiaFlag.png";
+      // code block
+      case "Germany":
+        return "./images/germanyFlag.png";
+      case "United Kingdom":
+        return "./images/unitedKingdomFlag.png";
+      case "France":
+        return "./images/franceFlag.png";
+      case "Italy":
+        return "./images/italyFlag.png";
+      case "Japan":
+        return "./images/japanFlag.png";
+      case "Bangladesh":
+        return "./images/bangladeshFlag.png";
+
+      // code block
+
+      default:
+      // code block
+    }
+  };
   useEffect(() => {
     const svg = d3.select(svgRef.current);
-    const width = 900;
+    const width = 1500;
     const height = 600;
     const margin = { top: 40, right: 40, bottom: 20, left: 150 };
 
@@ -94,6 +133,32 @@ const BarChartRace = () => {
         .text((d) => d.value.toLocaleString());
 
       labels.exit().remove();
+
+      // อัปเดตธง
+      const flags = svg.selectAll(".flag").data(dataForYear, (d) => d.name);
+
+      flags
+        .enter()
+        .append("image")
+        .attr("class", "flag")
+        .attr("x", (d) => x(d.value) + 5)
+        .attr("y", (d) => y(d.name) + y.bandwidth() / 2 - 10) // ปรับตำแหน่ง
+        .attr("dy", "0.35em")
+        .attr("width", 30)
+        .attr("height", 30)
+        .attr("href", (d) => d.flag)
+
+        .style("z-index", 10)
+        .merge(flags)
+        .transition()
+        .duration(200)
+        .attr("x", (d) => x(d.value) - 40)
+        .attr("y", (d) => y(d.name) + y.bandwidth() / 2 - 15) // ปรับตำแหน่ง
+        .attr("href", (d) => d.flag)
+        .each(function () {
+          console.log("image element:", this); // ดีบักที่นี่เพื่อตรวจสอบว่า element รูปภาพถูกสร้างหรือไม่
+        });
+      flags.exit().remove();
     };
 
     let yearIndex = 0;
@@ -106,11 +171,15 @@ const BarChartRace = () => {
             console.log(response?.data?.data);
             const formattedResponse = response?.data?.data;
             const newData = response?.data?.data?.countries;
+            const newDataWithFlag = newData.map((item) => ({
+              ...item,
+              flag: eachCountryFlag(item.name),
+            }));
             const sumPopulation = response?.data?.data?.sumContryPopulation;
 
             setSumPopulation(sumPopulation);
             // return response?.data?.data;
-            setData(newData);
+            setData(newDataWithFlag);
           })
           .catch((error) => console.error("error =>", error));
       } catch (error) {
@@ -126,7 +195,7 @@ const BarChartRace = () => {
         setYear(1950); // รีเซ็ตค่ากลับไปที่ 1950
       }
       updateChart(data);
-    }, 200);
+    }, 300);
     const legend = svg
       .selectAll(".legend")
       .data(color.domain())
@@ -152,6 +221,14 @@ const BarChartRace = () => {
       .attr("dy", ".35em")
       .style("text-anchor", "start")
       .text((d) => d);
+    svg
+      .append("defs")
+      .append("mask")
+      .attr("id", "circle-mask")
+      .append("circle")
+      .attr("cx", 20) // กำหนดตำแหน่งศูนย์กลาง
+      .attr("cy", 20)
+      .attr("r", 20); // กำหนดรัศมีของวงกลม
     return () => clearInterval(interValId);
   }, [year]);
 
@@ -163,7 +240,7 @@ const BarChartRace = () => {
         <h4>Total Population: {sumPopulation.toLocaleString()}</h4>
       </div>
       <div style={{ paddingTop: "20px" }}>
-        <svg ref={svgRef} style={{ width: "70%", height: "100%" }}>
+        <svg ref={svgRef} style={{ width: "100%", height: "100%" }}>
           <g className="x-axis" />
           <g className="y-axis" />
         </svg>
