@@ -51,7 +51,7 @@ const BarChartRace = () => {
   };
   useEffect(() => {
     const svg = d3.select(svgRef.current);
-    const width = 1500;
+    const width = 1200;
     const height = 600;
     const margin = { top: 40, right: 40, bottom: 20, left: 150 };
 

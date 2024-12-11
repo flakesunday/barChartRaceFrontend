@@ -19,7 +19,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" style={{ height: "100%" }}>
+    <html lang="en" style={{ height: "100vh" }}>
       <body
         className={`${geistSans.variable} ${geistMono.variable}`}
         style={{ maxHeight: "100%" }}
