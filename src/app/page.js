@@ -234,17 +234,23 @@ const BarChartRace = () => {
 
   return (
     <div style={{ padding: "20px" }}>
-      <div>
-        <h2>Population growth per country 1950 to 2021</h2>
-        <h3>Year: {year}</h3>
-        <h4>Total Population: {sumPopulation.toLocaleString()}</h4>
-      </div>
-      <div style={{ paddingTop: "20px" }}>
-        <svg ref={svgRef} style={{ width: "100%", height: "100%" }}>
-          <g className="x-axis" />
-          <g className="y-axis" />
-        </svg>
-      </div>
+      {data.length !== 0 ? (
+        <>
+          <div>
+            <h2>Population growth per country 1950 to 2021</h2>
+            <h3>Year: {year}</h3>
+            <h4>Total Population: {sumPopulation.toLocaleString()}</h4>
+          </div>
+          <div style={{ paddingTop: "20px" }}>
+            <svg ref={svgRef} style={{ width: "100%", height: "100%" }}>
+              <g className="x-axis" />
+              <g className="y-axis" />
+            </svg>
+          </div>
+        </>
+      ) : (
+        <h2>Loading...</h2>
+      )}
     </div>
   );
 };
